@@ -1,0 +1,1045 @@
+#:kivy 1.11.1
+#:import Factory kivy.factory.Factory
+#:import ScreenManager kivy.uix.screenmanager
+#:import Screen kivy.uix.screenmanager
+#:import Popup kivy.uix.popup
+#:import Spinner kivy.uix.spinner
+#:import DropDown kivy.uix.dropdown
+    
+
+ScreenManagement:
+
+
+<HomeScreen@Floatlayout>:
+    canvas.before:
+        Color:
+            rgba: 1,1,1,1
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 5
+        canvas.before:
+            Color:
+                rgba: 0,1,1,0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+
+
+        BoxLayout:
+            orientation: 'horizontal'
+            padding: 3
+
+            Label:
+                text: 'A'
+                color: 1,0,0,1
+                text_size: self.size
+                halign: 'center'
+                valign: 'center'
+                pos: self.pos
+                bold: True
+                font_size: self.height*0.6
+            Label:
+                text: 'B'
+                color: 0,0,1,1
+                text_size: self.size
+                halign: 'center'
+                valign: 'center'
+                pos: self.pos
+                bold: True
+                font_size: self.height*0.6
+            Label:
+                text: 'C'
+                color: 1,1,0,1
+                text_size: self.size
+                halign: 'center'
+                valign: 'center'
+                pos: self.pos
+                bold: True
+                font_size: self.height*0.6
+
+    Label:
+        id: welcome
+        size_hint: 1,1
+        pos_hint: {'x': 0, 'y': 0.33}
+        text: 'Sight Words'
+        color: 0,0,0,1
+        text_size: self.size
+        font_size: self.height/10
+        halign: 'center'
+        valign: 'center'
+        bold: True
+
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint: 1, 0.15
+        pos_hint: {'x':0, 'y':0}
+        
+
+        BoxLayout:
+            orientation: 'vertical'
+            padding: 5
+            Label:
+                text: 'Create New Reader'
+                text_size: self.size
+                font_size: self.height/2
+                color: 0,0,0,1
+                bold: True
+                halign: 'center'
+                valign: 'center'
+                
+
+            TextInput:
+                id: add_player
+                multiline: False
+                bold: True
+                font_size: self.height/2.2
+                text_size: self.size
+                halign: 'center'
+                valign: 'center'
+                text: ''
+                size_hint: 1,0.8
+            Button:
+                text: 'Submit New Reader'
+                color: 0,0,0,1
+                bold: True
+                font_size: self.height/1.5
+                background_normal: ""
+                background_color: 0,1,0,1
+                size_hint: 1,0.8
+                on_release:
+                    root.add_player()
+                    root.add_list_json()
+                    add_player.text = ''
+        
+        BoxLayout:
+            orientation: 'vertical'
+            padding: 5
+            Label:
+                text: 'Remove a Reader'
+                color: 0.5,0,0,1
+                bold: True
+                font_size: self.height/2
+                text_size: self.size
+                halign: 'center'
+                valign: 'center'
+                
+            Spinner:
+                id: remove_player
+                text: 'Select Here'
+                values: ['']
+                halign: "center"
+                valign: "center"
+                line_wrap: True
+                font_size: self.height/1.5
+                text_size : self.width, None
+                size_hint: 1,0.8
+                color: 0,0,0,1
+                bold: True
+                option_cls: Factory.CustomSpinnerOptions
+                background_normal: ""
+                background_color: 1,1,0,1
+                
+                on_release:
+                    root.show_players()
+                on_text:
+                    if self.text == 'Cancel': self.text = 'Select Here'
+
+            Button:
+                id: delete_player
+                text: 'Confirm Delete'
+                color: 0,0,0,1
+                bold: True
+                font_size: self.height/1.5
+                background_normal: ""
+                background_color: 1,0,0,1
+                size_hint: 1,0.8
+                on_release:
+                    root.delete_control()
+                    
+           
+
+        BoxLayout:
+            orientation: 'vertical'
+            padding: 5
+            Label:
+                text: 'Who is Reading'
+                color: 0,0,0,1
+                bold: True
+                font_size: self.height/2
+                text_size: self.size
+                halign: 'center'
+                valign: 'center'
+                size_hint: 1,0.8
+            Spinner:
+                id: choose_player
+                text: 'Select Here'
+                values: ['Please Create a Reader']
+                halign: "center"
+                valign: "center"
+                line_wrap: True
+                font_size: self.height/2
+                text_size : self.width, None
+                color: 0,0,0,1
+                bold: True
+                option_cls: Factory.CustomSpinnerOptions
+                background_normal: ""
+                background_color: 0,0.5,0.5,0.7
+                
+                on_release:
+                    root.show_players()
+
+        BoxLayout:
+            orientation: 'vertical'
+            padding: 5
+            Label:
+                text: 'Start Reading'
+                size_hint: 1,0.8
+                color: 0,0,0,1
+                font_size: self.height/2
+                bold: True
+                text_size: self.size
+                halign: 'center'
+                valign: 'center'
+            Button:
+                text: "Press to Start"
+                text_size: self.size
+                font_size: self.height/2
+                color: 0,0,0,1
+                halign: 'center'
+                valign: 'center'
+                bold: True
+                background_normal: ""
+                background_color: 0,1,0,0.2
+                
+                on_release:
+                    root.start_game()
+                    if root.playing == True: root.manager.current = 'words'; root.change_label()
+
+
+<SelectPlayer>:
+
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: 1,1,1,1
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        Label:
+            text: 'Please select a reader to play the sightwords game.'
+            color: 0,0,0,1
+            text_size: self.size
+            font_size: self.height/10
+            halign: 'center'
+            valign: 'center'
+            canvas.before:
+                Color:
+                    rgba: 0.5,0,0.5,0.5
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+        Button:
+            text: 'OK'
+            color: 0,0,0,1
+            size_hint: 1,0.5
+            background_normal: ""
+            background_color: 0,1,0,1
+            on_release:
+                root.dismiss()          
+
+
+<ChapterDropDown>:
+    cdd: chapterdropdown
+    id: chapterdropdown
+    size_hint_y: None
+
+    Button:
+        id: chap1
+        text: 'Chapter 1'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.5,0.5,1
+        on_release:
+            root.select(chap1.text)
+    Button:
+        id: chap2
+        text: 'Chapter 2'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.5,0.5,1
+        on_release:
+            root.select(chap2.text)
+    Button:
+        id: chap3
+        text: 'Chapter 3'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.5,0.5,1
+        on_release:
+            root.select(chap3.text)
+    Button:
+        id: chap4
+        text: 'Chapter 4'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.5,0.5,1
+        on_release:
+            root.select(chap4.text)
+    Button:
+        id: chap5
+        text: 'Chapter 5'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.5,0.5,1
+        on_release:
+            root.select(chap5.text)
+    Button:
+        id: chap6
+        text: 'Chapter 6'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.5,0.5,1
+        on_release:
+            root.select(chap6.text)
+
+
+
+<LessonDropDown>:
+    ldd: lessondropdown
+    id: lessondropdown
+    size_hint_y: None
+
+    Button:
+        id: lesson1
+        text: 'Lesson 1'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson1.text)
+    Button:
+        id: lesson2
+        text: 'Lesson 2'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson2.text)
+    Button:
+        id: lesson3
+        text: 'Lesson 3'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson3.text)
+    Button:
+        id: lesson4
+        text: 'Lesson 4'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson4.text)
+    Button:
+        id: lesson5
+        text: 'Lesson 5'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson5.text)
+    Button:
+        id: lesson6
+        text: 'Lesson 6'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson6.text)
+    Button:
+        id: lesson7
+        text: 'Lesson 7'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson7.text)
+    Button:
+        id: lesson8
+        text: 'Lesson 8'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson8.text)
+    Button:
+        id: lesson9
+        text: 'Lesson 9'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson9.text)
+    Button:
+        id: lesson10
+        text: 'Lesson 10'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson10.text)
+
+<DeletePop>:
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: 1,0,0,1
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        Label:
+            text: 'WARNING\n\nDeleting this Reader will permanantly delete all of their accomplishments'
+            color: 0,0,0,1
+
+            text_size: self.size
+            font_size: 22
+            halign: 'center'
+            valign: 'center'
+            bold: True
+        
+        Button:
+            text: 'Cancel'
+            color: 0,0,0,1
+            size_hint: 1,0.25
+            text_size: self.size
+            font_size: self.height/3
+            halign: 'center'
+            valign: 'center'
+            bold: True
+            on_release:
+                root.dismiss()
+                app.homescreen.confirm_delete = False       
+        Button:
+            size_hint: 1,0.25
+            text: 'Continue and Press the "Confirm Delete" Button again to Delete'
+            color: 0,0,0,1
+            text_size: self.size
+            font_size: self.height/3
+            halign: 'center'
+            valign: 'center'
+            background_normal: ''
+            background_color: 1, 0, 0, 1
+            on_release:
+                root.dismiss()
+                app.homescreen.confirm_delete = True
+
+
+<ExitPop>:
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: 1,1,1,1
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        Label:
+            canvas.before:
+                Color:
+                    rgba: 0,0.75,0,1
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            size_hint: 1,0.66
+            text: 'Come Back Soon!!!'
+            color: 0,0,0,1
+            text_size: self.size
+            font_size: self.height/4
+            halign: 'center'
+            valign: 'center'
+            bold: True
+        Button:
+            text: 'Confirm Exit'
+            color: 0,0,0,1
+            text_size: self.size
+            font_size: self.height/3
+            halign: 'center'
+            valign: 'center'
+            background_normal: ''
+            background_color: 1, 0, 0, 1
+            on_release:
+                exit()
+        Button:
+            text: 'Keep Learning'
+            color: 0,0,0,1
+            text_size: self.size
+            font_size: self.height/3
+            halign: 'center'
+            valign: 'center'
+            background_normal: ''
+            background_color: 0,0.6,1,0.7
+            on_release:
+                root.dismiss()
+
+
+
+<Redirect>:
+    BoxLayout:
+        orientation: 'vertical'
+        Button:
+            id: direct
+            text: 'Go To Website'
+            color: 0,0,0,1
+            text_size: self.size
+            font_size: self.height/3
+            halign: 'center'
+            valign: 'center'
+            background_normal: ''
+            background_color: 0,1,1,1
+            on_release:
+                if app.site == 'wiki': app.resourcescreen.open_wiki()
+                if app.site == 'us': app.resourcescreen.open_ed()
+                root.dismiss()
+        Button:
+            text: 'Back to Sightwords'
+            color: 0,0,0,1
+            text_size: self.size
+            font_size: self.height/3
+            halign: 'center'
+            valign: 'center'
+            background_normal: ''
+            # background_color: 0,0.5,0.25,0.5
+            background_color: 0,1,0,1
+            on_release:
+                root.dismiss()
+
+                
+
+
+<CustomSpinnerOptions@SpinnerOption>:
+    size_hint_y: None
+    text_size : self.width, None
+    height: self.texture_size[1]
+    color: 0,0,0,1
+    bold: True
+    padding: 3, 3
+    background_normal: ""
+    #background_color: 0,0,1,0.2
+
+
+<WordsScreen@FloatLayout>:
+    id: word_screen
+    ws: word_screen
+    canvas.before:
+        Color:
+            #rgba: 1,1,1,1
+            rgba: 0,0,0,1
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+    BoxLayout:
+        id: learning
+        orientation: 'vertical'
+        padding: 5
+
+        Label:
+            id: plyr_banner
+            text: 'Hello '
+            color: 1,1,1,1
+            size_hint: 1, 0.08
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1, 0.1
+            padding: (0,5)
+
+            Button:
+                text: 'Progress & Resources'
+                color: 0,0,0,1
+                text_size: self.size
+                font_size: self.height/2
+                halign: 'center'
+                valign: 'center'
+                bold: True
+                background_normal: ""
+                background_color: 0,1,0,1
+                padding: (5,5)
+                on_release:
+                    root.manager.current = 'resource'
+                    root.change_label()
+
+            Label:
+                size_hint: 0.05, 1
+
+            Button:
+                id: login
+                text: 'Go to Login'
+                color: 0,0,0,1
+                text_size: self.size
+                font_size: self.height/2
+                halign: 'center'
+                valign: 'center'
+                bold: True
+                background_normal: ""
+                background_color: 1,1,0,1
+                padding: (5,5)
+                on_release:
+                    root.manager.current = 'home'
+
+            Label:
+                size_hint: 0.05, 1
+
+            Button:
+                text: 'Exit'
+                color: 0,0,0,1
+                text_size: self.size
+                font_size: self.height/2
+                halign: 'center'
+                valign: 'center'
+                bold: True
+                background_normal: ""
+                background_color: 1,0,0,1
+                padding: (5,5)
+                on_release:
+                    root.exitpop()
+
+        BoxLayout:
+            id: chap_btns
+            orientation: 'horizontal'
+            size_hint: 1,0.2
+            padding: (0,5)
+
+            Button:
+                id: chapters
+                text:'Chapters'
+                color: 0,0,0,1
+                text_size: self.size
+                font_size: self.height/2
+                halign: 'center'
+                valign: 'center'
+                bold: True
+                background_normal: ""
+                background_color: 0,0,1,1
+                on_release:
+                    root.chap_drop.open(self)
+
+            Label:
+                size_hint: 0.05, 1
+
+            Button:
+                id: lessons
+                text: 'Lessons'
+                color: 0,0,0,1
+                text_size: self.size
+                font_size: self.height/2
+                halign: 'center'
+                valign: 'center'
+                bold: True
+                background_normal: ''
+                background_color: 0,0.5,85,1
+                on_release:
+                    root.less_drop.open(self)
+
+        Label:
+            id: words
+            size_hint: 1,1
+            text: 'Get Ready!!!'
+            color: 0,0,0,1
+            text_size: self.size
+            font_size: self.height/4
+            halign: 'center'
+            valign: 'center'
+            bold: True
+            #padding: (5,5)
+            canvas.before:
+                Color:
+                    rgba: 0,1,0,0.8
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+
+        Button:
+            text: 'Test'
+            size_hint: 0.5, 0.1
+            pos_hint: {'x': 0.25, 'y': 0.27}
+            color: 0,0,0,1
+            text_size: self.size
+            font_size: self.height/2
+            halign: 'center'
+            valign: 'center'
+            bold: True
+            on_release:
+                #root.checker()
+                root.completed_lesson()
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1, 0.25
+            padding: (0,5)
+
+            Spinner:
+                id: preview
+                text: 'Preview Words'
+                values: ['Select a Chapter and Lesson']
+                halign: "center"
+                valign: "center"
+                line_wrap: True
+                font_size: self.height/4
+                text_size : self.width, None
+                color: 0,0,0,1
+                option_cls: Factory.CustomSpinnerOptions
+                background_normal: ""
+                background_color: 0,0.5,0.5,0.7
+
+                
+                on_press:
+                    if chapters.text != 'Chapters' and lessons.text != 'Lessons': root.preview()
+                on_text:
+                    self.text = 'Preview Words'
+
+            Label:
+                size_hint: 0.05, 1
+
+            Button:
+                id: start
+                text: 'Press to Begin'
+                color: 0,0,0,1
+                text_size: self.size
+                font_size: self.height/4
+                halign: 'center'
+                valign: 'center'
+                bold: True
+                background_normal: ""
+                background_color: 0,1,0.5,1
+                # on_press:
+                    # root.preview()
+                    # root.word_label()
+                on_release: root.preview()
+                    # self.disabled = True
+                    # root.chooser()
+                    
+                    # root.word_label()
+                    
+                    # if chapters.text != 'Chapters' and lessons.text != 'Lessons': root.chooser()
+
+
+
+<ResourceScreen>:
+    rs: resources
+    
+    canvas.before:
+        Color:
+            #rgba: 1,1,1,1
+            rgba: 0,0,0,1
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+    BoxLayout:
+        orientation: 'vertical'
+        id: resources
+        #padding: 10
+        size_hint: 1, 0.25
+        pos_hint: {'x':0, 'y':0.75}
+
+        Label:
+            id: plyr_banner2
+            text: 'Hello '
+            color: 1,1,1,1
+            size_hint: 1, 0.12
+            padding: (3,3)
+
+        BoxLayout:
+            orientation: 'horizontal'
+            padding: (5,5)
+
+            Button:
+                background_normal: ''
+                background_color: 0,1,0,0.8
+                text:'Return to Sight Words'
+                text_size: self.size
+                #font_size: self.height/2
+                halign: 'center'
+                valign: 'center'
+                color: 0,0,0,1
+                bold: True
+                padding: (5,5)
+                on_release:
+                    root.manager.current = 'words'
+            Label:
+                size_hint: 0.05, 1
+
+            Button:
+                text: 'Change Login'
+                color: 0,0,0,1
+                text_size: self.size
+                #font_size: self.height/2
+                halign: 'center'
+                valign: 'center'
+                bold: True
+                background_normal: ""
+                background_color: 0,1,1,1
+                padding: (5,5)
+                on_release:
+                    root.manager.current = 'home'
+
+            Label:
+                size_hint: 0.05, 1
+
+            Button:
+                id: wiki
+                background_normal: ""
+                background_color: 1,0,1,0.8
+                text: 'Go to Wikipedia Resource'
+                text_size: self.size
+                #font_size: self.height/2
+                halign: 'center'
+                valign: 'center'
+                color: 0,0,0,1
+                bold: True
+                padding: (5,5)
+                on_release:
+                    root.direct()
+                    app.site = 'wiki'
+
+            Label:
+                size_hint: 0.05, 1
+
+            Button:
+                id: us_ed
+                background_normal: ""
+                background_color: 1,1,0,1
+                text_size: self.size
+                #font_size: self.height/2
+                halign: 'center'
+                valign: 'center'
+                text: 'Go to US Dept. of Ed Resource'
+                color: 0,0,0,1
+                bold: True
+                padding: (5,5)
+                on_release:
+                    root.direct()
+                    app.site = 'us'
+
+            Label:
+                size_hint: 0.05, 1
+
+            Button:
+                size_hint: 0.5, 1
+                text: 'Exit'
+                color: 0,0,0,1
+                text_size: self.size
+                #font_size: self.height/2
+                halign: 'center'
+                valign: 'center'
+                bold: True
+                background_normal: ""
+                background_color: 0.9,0,0,0.7
+                padding: (5,5)
+                on_release:
+                    root.exitpop()
+
+
+    BoxLayout:
+        orientation:'vertical'
+        size_hint: 1,0.75
+        padding: 3
+        canvas.before:
+            Color:
+                #rgba: 1,1,1,1
+                rgba: 0,0,0,1
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        Label:
+            text: 'Press the "Chapter" Buttons Below to See Your Completed Lessons'
+            color: 1,1,1,1
+            bold: True
+            size_hint: 1, 0.10
+            pos_hint: {'x':0, 'y':0.65}
+            # canvas.before:
+            #     Color:
+            #         #rgba: 0.75, 0.75, 0.75, 0.5
+            #         rgba: 1,1,1,1
+            #     Rectangle:
+            #         size: self.size
+            #         pos: self.pos
+        BoxLayout:
+            orientation: 'horizontal'
+            id: completions
+            canvas.before:
+                Color:
+                    rgba: 0.82, 0.82, 0.82, 1
+                    #rgba: 0,0,0,1
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+
+            Spinner:
+                id: chp1
+                text: 'Chapter 1'
+                color: 0,0,0,1
+                size_hint: 1, 0.10
+                pos_hint: {'x':0, 'y':0.9}
+                values: ''
+                halign: "center"
+                valign: "center"
+                text_size : self.width, None
+                color: 0,0,0,1
+                bold: True
+                option_cls: Factory.CustomSpinnerOptions
+                background_normal: ""
+                background_color: 0,0.5,0.5,0.7
+                on_text:
+                    self.text = 'Chapter 1'
+                on_press:
+                    self.values = root.complete_less_spinner(0)
+
+            Spinner:
+                id: chp2
+                text: 'Chapter 2'
+                color: 0,0,0,1
+                size_hint: 1, 0.10
+                pos_hint: {'x':0, 'y':0.9}
+                values: ''
+                halign: "center"
+                valign: "center"
+                text_size : self.width, None
+                color: 0,0,0,1
+                bold: True
+                option_cls: Factory.CustomSpinnerOptions
+                background_normal: ""
+                background_color: 0,0.5,0.5,0.7
+                on_text:
+                    self.text = 'Chapter 2'
+                on_press:
+                    self.values = root.complete_less_spinner(1)
+
+            Spinner:
+                id: chp3
+                text: 'Chapter 3'
+                color: 0,0,0,1
+                size_hint: 1, 0.10
+                pos_hint: {'x':0, 'y':0.9}
+                values: ''
+                halign: "center"
+                valign: "center"
+                text_size : self.width, None
+                color: 0,0,0,1
+                bold: True
+                option_cls: Factory.CustomSpinnerOptions
+                background_normal: ""
+                background_color: 0,0.5,0.5,0.7
+                on_text:
+                    self.text = 'Chapter 3'
+                on_press:
+                    self.values = root.complete_less_spinner(2)
+
+            Spinner:
+                id: chp4
+                text: 'Chapter 4'
+                color: 0,0,0,1
+                size_hint: 1, 0.10
+                pos_hint: {'x':0, 'y':0.9}
+                values: ''
+                halign: "center"
+                valign: "center"
+                text_size : self.width, None
+                color: 0,0,0,1
+                bold: True
+                option_cls: Factory.CustomSpinnerOptions
+                background_normal: ""
+                background_color: 0,0.5,0.5,0.7
+                on_text:
+                    self.text = 'Chapter 4'
+                on_press:
+                    self.values = root.complete_less_spinner(3)
+
+            Spinner:
+                id: chp5
+                text: 'Chapter 5'
+                color: 0,0,0,1
+                size_hint: 1, 0.10
+                pos_hint: {'x':0, 'y':0.9}
+                values: ''
+                halign: "center"
+                valign: "center"
+                text_size : self.width, None
+                color: 0,0,0,1
+                bold: True
+                option_cls: Factory.CustomSpinnerOptions
+                background_normal: ""
+                background_color: 0,0.5,0.5,0.7
+                on_text:
+                    self.text = 'Chapter 5'
+                on_press:
+                    self.values = root.complete_less_spinner(4)
+
+            Spinner:
+                id: chp6
+                text: 'Chapter 6'
+                color: 0,0,0,1
+                size_hint: 1, 0.10
+                pos_hint: {'x':0, 'y':0.9}
+                values: ''
+                halign: "center"
+                valign: "center"
+                text_size : self.width, None
+                color: 0,0,0,1
+                bold: True
+                option_cls: Factory.CustomSpinnerOptions
+                background_normal: ""
+                background_color: 0,0.5,0.5,0.7
+                on_text:
+                    self.text = 'Chapter 6'
+                on_press:
+                    self.values = root.complete_less_spinner(5)
+            Button:
+                text: 'jsonClear'
+                on_release:  app.word_data.clear()
+
+
+
+                
+
+
