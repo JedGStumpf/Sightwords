@@ -10,6 +10,339 @@
 ScreenManagement:
 
 
+<ExitPop>:
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: 1,1,1,1
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        Label:
+            canvas.before:
+                Color:
+                    rgba: 0,0.75,0,1
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            size_hint: 1,0.66
+            text: 'Come Back Soon!!!'
+            color: 0,0,0,1
+            text_size: self.size
+            font_size: self.height/4
+            halign: 'center'
+            valign: 'center'
+            bold: True
+        Button:
+            text: 'Confirm Exit'
+            color: 0,0,0,1
+            text_size: self.size
+            font_size: self.height/3
+            halign: 'center'
+            valign: 'center'
+            background_normal: ''
+            background_color: 1, 0, 0, 1
+            on_release: exit()
+                
+        Button:
+            text: 'Keep Learning'
+            color: 0,0,0,1
+            text_size: self.size
+            font_size: self.height/3
+            halign: 'center'
+            valign: 'center'
+            background_normal: ''
+            background_color: 0,0.6,1,0.7
+            on_release: root.dismiss()
+
+
+<Redirect>:
+    BoxLayout:
+        orientation: 'vertical'
+        Button:
+            id: direct
+            text: 'Go To Website'
+            color: 0,0,0,1
+            text_size: self.size
+            font_size: self.height/3
+            halign: 'center'
+            valign: 'center'
+            background_normal: ''
+            background_color: 0,1,1,1
+            on_release:
+                if app.site == 'wiki': app.resourcescreen.open_wiki()
+                if app.site == 'us': app.resourcescreen.open_ed()
+                root.dismiss()
+        Button:
+            text: 'Back to Sightwords'
+            color: 0,0,0,1
+            text_size: self.size
+            font_size: self.height/3
+            halign: 'center'
+            valign: 'center'
+            background_normal: ''
+            # background_color: 0,0.5,0.25,0.5
+            background_color: 0,1,0,1
+            on_release:
+                root.dismiss()
+
+
+<DeletePop>:
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: 1,0,0,1
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        Label:
+            text: 'WARNING\n\nDeleting this Reader will permanantly delete all of their accomplishments'
+            color: 0,0,0,1
+
+            text_size: self.size
+            font_size: 22
+            halign: 'center'
+            valign: 'center'
+            bold: True
+        
+        Button:
+            text: 'Cancel'
+            color: 0,0,0,1
+            size_hint: 1,0.25
+            text_size: self.size
+            font_size: self.height/3
+            halign: 'center'
+            valign: 'center'
+            bold: True
+            on_release:
+                # app.homescreen.undo_confirm()
+                root.dismiss()
+
+        Button:
+            size_hint: 1,0.25
+            text: 'Continue and Press the "Confirm Delete" Button again to Delete'
+            color: 0,0,0,1
+            text_size: self.size
+            font_size: self.height/3
+            halign: 'center'
+            valign: 'center'
+            background_normal: ''
+            background_color: 1, 0, 0, 1
+            on_release:
+                # app.homescreen.confirmation()
+                root.dismiss()
+
+
+<SelectPlayer>:
+
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: 1,1,1,1
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        Label:
+            text: 'Please select a reader to play the sightwords game.'
+            color: 0,0,0,1
+            text_size: self.size
+            font_size: self.height/10
+            halign: 'center'
+            valign: 'center'
+            canvas.before:
+                Color:
+                    rgba: 0.5,0,0.5,0.5
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+        Button:
+            text: 'OK'
+            color: 0,0,0,1
+            size_hint: 1,0.5
+            background_normal: ""
+            background_color: 0,1,0,1
+            on_release:
+                root.dismiss()
+
+
+<ChapterDropDown>:
+    cdd: chapterdropdown
+    id: chapterdropdown
+    size_hint_y: None
+
+    Button:
+        id: chap1
+        text: 'Chapter 1'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.5,0.5,1
+        on_release:
+            root.select(chap1.text)
+    Button:
+        id: chap2
+        text: 'Chapter 2'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.5,0.5,1
+        on_release:
+            root.select(chap2.text)
+    Button:
+        id: chap3
+        text: 'Chapter 3'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.5,0.5,1
+        on_release:
+            root.select(chap3.text)
+    Button:
+        id: chap4
+        text: 'Chapter 4'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.5,0.5,1
+        on_release:
+            root.select(chap4.text)
+    Button:
+        id: chap5
+        text: 'Chapter 5'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.5,0.5,1
+        on_release:
+            root.select(chap5.text)
+    Button:
+        id: chap6
+        text: 'Chapter 6'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.5,0.5,1
+        on_release:
+            root.select(chap6.text)
+
+
+
+<LessonDropDown>:
+    ldd: lessondropdown
+    id: lessondropdown
+    size_hint_y: None
+
+    Button:
+        id: lesson1
+        text: 'Lesson 1'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson1.text)
+    Button:
+        id: lesson2
+        text: 'Lesson 2'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson2.text)
+    Button:
+        id: lesson3
+        text: 'Lesson 3'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson3.text)
+    Button:
+        id: lesson4
+        text: 'Lesson 4'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson4.text)
+    Button:
+        id: lesson5
+        text: 'Lesson 5'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson5.text)
+    Button:
+        id: lesson6
+        text: 'Lesson 6'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson6.text)
+    Button:
+        id: lesson7
+        text: 'Lesson 7'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson7.text)
+    Button:
+        id: lesson8
+        text: 'Lesson 8'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson8.text)
+    Button:
+        id: lesson9
+        text: 'Lesson 9'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson9.text)
+    Button:
+        id: lesson10
+        text: 'Lesson 10'
+        size_hint_y: None
+        height: 30
+        color: 0,0,0,1
+        background_normal: ''
+        background_color: 0,0.75,0.75,1
+        on_release:
+            root.select(lesson10.text)
+
+
 <HomeScreen@Floatlayout>:
     canvas.before:
         Color:
@@ -220,341 +553,6 @@ ScreenManagement:
                     if root.playing == True: root.manager.current = 'words'; root.change_label()
 
 
-<SelectPlayer>:
-
-    BoxLayout:
-        orientation: 'vertical'
-        canvas.before:
-            Color:
-                rgba: 1,1,1,1
-            Rectangle:
-                size: self.size
-                pos: self.pos
-        Label:
-            text: 'Please select a reader to play the sightwords game.'
-            color: 0,0,0,1
-            text_size: self.size
-            font_size: self.height/10
-            halign: 'center'
-            valign: 'center'
-            canvas.before:
-                Color:
-                    rgba: 0.5,0,0.5,0.5
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
-        Button:
-            text: 'OK'
-            color: 0,0,0,1
-            size_hint: 1,0.5
-            background_normal: ""
-            background_color: 0,1,0,1
-            on_release:
-                root.dismiss()          
-
-
-<ChapterDropDown>:
-    cdd: chapterdropdown
-    id: chapterdropdown
-    size_hint_y: None
-
-    Button:
-        id: chap1
-        text: 'Chapter 1'
-        size_hint_y: None
-        height: 30
-        color: 0,0,0,1
-        background_normal: ''
-        background_color: 0,0.5,0.5,1
-        on_release:
-            root.select(chap1.text)
-    Button:
-        id: chap2
-        text: 'Chapter 2'
-        size_hint_y: None
-        height: 30
-        color: 0,0,0,1
-        background_normal: ''
-        background_color: 0,0.5,0.5,1
-        on_release:
-            root.select(chap2.text)
-    Button:
-        id: chap3
-        text: 'Chapter 3'
-        size_hint_y: None
-        height: 30
-        color: 0,0,0,1
-        background_normal: ''
-        background_color: 0,0.5,0.5,1
-        on_release:
-            root.select(chap3.text)
-    Button:
-        id: chap4
-        text: 'Chapter 4'
-        size_hint_y: None
-        height: 30
-        color: 0,0,0,1
-        background_normal: ''
-        background_color: 0,0.5,0.5,1
-        on_release:
-            root.select(chap4.text)
-    Button:
-        id: chap5
-        text: 'Chapter 5'
-        size_hint_y: None
-        height: 30
-        color: 0,0,0,1
-        background_normal: ''
-        background_color: 0,0.5,0.5,1
-        on_release:
-            root.select(chap5.text)
-    Button:
-        id: chap6
-        text: 'Chapter 6'
-        size_hint_y: None
-        height: 30
-        color: 0,0,0,1
-        background_normal: ''
-        background_color: 0,0.5,0.5,1
-        on_release:
-            root.select(chap6.text)
-
-
-
-<LessonDropDown>:
-    ldd: lessondropdown
-    id: lessondropdown
-    size_hint_y: None
-
-    Button:
-        id: lesson1
-        text: 'Lesson 1'
-        size_hint_y: None
-        height: 30
-        color: 0,0,0,1
-        background_normal: ''
-        background_color: 0,0.75,0.75,1
-        on_release:
-            root.select(lesson1.text)
-    Button:
-        id: lesson2
-        text: 'Lesson 2'
-        size_hint_y: None
-        height: 30
-        color: 0,0,0,1
-        background_normal: ''
-        background_color: 0,0.75,0.75,1
-        on_release:
-            root.select(lesson2.text)
-    Button:
-        id: lesson3
-        text: 'Lesson 3'
-        size_hint_y: None
-        height: 30
-        color: 0,0,0,1
-        background_normal: ''
-        background_color: 0,0.75,0.75,1
-        on_release:
-            root.select(lesson3.text)
-    Button:
-        id: lesson4
-        text: 'Lesson 4'
-        size_hint_y: None
-        height: 30
-        color: 0,0,0,1
-        background_normal: ''
-        background_color: 0,0.75,0.75,1
-        on_release:
-            root.select(lesson4.text)
-    Button:
-        id: lesson5
-        text: 'Lesson 5'
-        size_hint_y: None
-        height: 30
-        color: 0,0,0,1
-        background_normal: ''
-        background_color: 0,0.75,0.75,1
-        on_release:
-            root.select(lesson5.text)
-    Button:
-        id: lesson6
-        text: 'Lesson 6'
-        size_hint_y: None
-        height: 30
-        color: 0,0,0,1
-        background_normal: ''
-        background_color: 0,0.75,0.75,1
-        on_release:
-            root.select(lesson6.text)
-    Button:
-        id: lesson7
-        text: 'Lesson 7'
-        size_hint_y: None
-        height: 30
-        color: 0,0,0,1
-        background_normal: ''
-        background_color: 0,0.75,0.75,1
-        on_release:
-            root.select(lesson7.text)
-    Button:
-        id: lesson8
-        text: 'Lesson 8'
-        size_hint_y: None
-        height: 30
-        color: 0,0,0,1
-        background_normal: ''
-        background_color: 0,0.75,0.75,1
-        on_release:
-            root.select(lesson8.text)
-    Button:
-        id: lesson9
-        text: 'Lesson 9'
-        size_hint_y: None
-        height: 30
-        color: 0,0,0,1
-        background_normal: ''
-        background_color: 0,0.75,0.75,1
-        on_release:
-            root.select(lesson9.text)
-    Button:
-        id: lesson10
-        text: 'Lesson 10'
-        size_hint_y: None
-        height: 30
-        color: 0,0,0,1
-        background_normal: ''
-        background_color: 0,0.75,0.75,1
-        on_release:
-            root.select(lesson10.text)
-
-<DeletePop>:
-    BoxLayout:
-        orientation: 'vertical'
-        canvas.before:
-            Color:
-                rgba: 1,0,0,1
-            Rectangle:
-                size: self.size
-                pos: self.pos
-        Label:
-            text: 'WARNING\n\nDeleting this Reader will permanantly delete all of their accomplishments'
-            color: 0,0,0,1
-
-            text_size: self.size
-            font_size: 22
-            halign: 'center'
-            valign: 'center'
-            bold: True
-        
-        Button:
-            text: 'Cancel'
-            color: 0,0,0,1
-            size_hint: 1,0.25
-            text_size: self.size
-            font_size: self.height/3
-            halign: 'center'
-            valign: 'center'
-            bold: True
-            on_release:
-                root.dismiss()
-                app.homescreen.confirm_delete = False       
-        Button:
-            size_hint: 1,0.25
-            text: 'Continue and Press the "Confirm Delete" Button again to Delete'
-            color: 0,0,0,1
-            text_size: self.size
-            font_size: self.height/3
-            halign: 'center'
-            valign: 'center'
-            background_normal: ''
-            background_color: 1, 0, 0, 1
-            on_release:
-                root.dismiss()
-                app.homescreen.confirm_delete = True
-
-
-<ExitPop>:
-    BoxLayout:
-        orientation: 'vertical'
-        canvas.before:
-            Color:
-                rgba: 1,1,1,1
-            Rectangle:
-                size: self.size
-                pos: self.pos
-        Label:
-            canvas.before:
-                Color:
-                    rgba: 0,0.75,0,1
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
-            size_hint: 1,0.66
-            text: 'Come Back Soon!!!'
-            color: 0,0,0,1
-            text_size: self.size
-            font_size: self.height/4
-            halign: 'center'
-            valign: 'center'
-            bold: True
-        Button:
-            text: 'Confirm Exit'
-            color: 0,0,0,1
-            text_size: self.size
-            font_size: self.height/3
-            halign: 'center'
-            valign: 'center'
-            background_normal: ''
-            background_color: 1, 0, 0, 1
-            on_release:
-                exit()
-        Button:
-            text: 'Keep Learning'
-            color: 0,0,0,1
-            text_size: self.size
-            font_size: self.height/3
-            halign: 'center'
-            valign: 'center'
-            background_normal: ''
-            background_color: 0,0.6,1,0.7
-            on_release:
-                root.dismiss()
-
-
-
-<Redirect>:
-    BoxLayout:
-        orientation: 'vertical'
-        Button:
-            id: direct
-            text: 'Go To Website'
-            color: 0,0,0,1
-            text_size: self.size
-            font_size: self.height/3
-            halign: 'center'
-            valign: 'center'
-            background_normal: ''
-            background_color: 0,1,1,1
-            on_release:
-                if app.site == 'wiki': app.resourcescreen.open_wiki()
-                if app.site == 'us': app.resourcescreen.open_ed()
-                root.dismiss()
-        Button:
-            text: 'Back to Sightwords'
-            color: 0,0,0,1
-            text_size: self.size
-            font_size: self.height/3
-            halign: 'center'
-            valign: 'center'
-            background_normal: ''
-            # background_color: 0,0.5,0.25,0.5
-            background_color: 0,1,0,1
-            on_release:
-                root.dismiss()
-
-                
-
-
 <CustomSpinnerOptions@SpinnerOption>:
     size_hint_y: None
     text_size : self.width, None
@@ -739,6 +737,22 @@ ScreenManagement:
 
             Label:
                 size_hint: 0.05, 1
+            
+            Button:
+                id: read_list
+                text: 'Hear Lesson Words'
+                color: 0,0,0,1
+                text_size: self.size
+                font_size: self.height/4
+                halign: 'center'
+                valign: 'center'
+                bold: True
+                background_normal: ""
+                background_color: 0,1,0.5,1
+                on_release: root.call_read_list()         
+
+            Label:
+                size_hint: 0.05, 1
 
             Button:
                 id: start
@@ -754,7 +768,10 @@ ScreenManagement:
                 # on_press:
                     # root.preview()
                     # root.word_label()
-                on_release: root.preview()
+                on_release:
+                    root.reading = True
+                    root.preview()
+                    
                     # self.disabled = True
                     # root.chooser()
                     
@@ -1037,9 +1054,3 @@ ScreenManagement:
             Button:
                 text: 'jsonClear'
                 on_release:  app.word_data.clear()
-
-
-
-                
-
-
