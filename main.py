@@ -6,7 +6,8 @@ import os
 import re
 import time
 import speech_recognition as sr
-import pyaudio 
+import pyaudio
+import pyttsx3
 import webbrowser as webbrowser
 import random as random
 from random import shuffle as shuffle
@@ -43,6 +44,7 @@ from kivy.animation import Animation
 comp_list = [[], [], [], [], [], []]
 player = ''
 site = ''
+confirm_delete = False
 
 
 class ScreenManagement(ScreenManager):
@@ -52,13 +54,14 @@ class ExitPop(Popup):
     pass
 
 class Redirect(Popup):
-    pass
+    pass    
 
 class DeletePop(Popup):
     pass
 
 class SelectPlayer(Popup):
     pass
+
 
 class ChapterDropDown(DropDown):
     cdd = ObjectProperty(None)
@@ -75,14 +78,14 @@ class LessonDropDown(DropDown):
 
 
 class HomeScreen(Screen):
-
-    confirm_delete = False
     selected_player = ''
     playing = False
+
     
     def __init__(self, **kwargs):
         super(HomeScreen, self).__init__(**kwargs)
         self.player_list = player_list = ListProperty()
+        self.confirm_delete = confirm_delete
 
 
     def load_list(self):
@@ -100,8 +103,10 @@ class HomeScreen(Screen):
         Method to create a new player and handles a duplicate entry.
         """
         self.load_list()
-        if self.ids.add_player.text not in self.player_list and self.ids.add_player.text != '' and self.ids.add_player.text != 'Select a Player':
-            self.player_list.append(self.ids.add_player.text)
+        if self.ids.add_player.text not in self.player_list:
+            if self.ids.add_player.text != '' and self.ids.add_player.text != 'Select a Player':
+            
+                self.player_list.append(self.ids.add_player.text)
     
     def show_players(self):
         self.load_list()
@@ -123,6 +128,7 @@ class HomeScreen(Screen):
             self.must_select()
         else:
             self.playing = True
+            self.confirm_delete = False
         
 
     def rem_player(self):
@@ -130,12 +136,14 @@ class HomeScreen(Screen):
         This method deletes all records of a selcted reader
         """
         player = self.ids.remove_player.text
-        if player != self.selected_player:
-            SightWordsApp.homescreen.confirm_delete = False
-            return
+        print(player)
+        print(f'what: {self.selected_player}')
+        # if player != self.selected_player:
+        #     self.confirm_delete = False
+        #     return
         self.load_list()
-        if self.ids.remove_player.text in self.player_list:
-            self.player_list.pop(self.player_list.index(self.ids.remove_player.text))
+        if player in self.player_list:
+            self.player_list.pop(self.player_list.index(player))
 
         for plyr in SightWordsApp.wordsscreen.completed_tup:
             remove = player+plyr
@@ -148,29 +156,52 @@ class HomeScreen(Screen):
         self.playing = False
         self.add_list_json()
     
-
+    # def confirmation(self):
+    #     self.confirm_delete = True
+    
+    # def undo_confirm(self):
+    #     self.confirm_delete = False
 
     def delete_control(self):
         """
         Method to control the deletion of a player and handles a popup in case this is pressed by mistake.  3 buttons will need to be pressed to complete the deletion
         """
-        if self.ids.remove_player.text == 'Select Here':
-            return
+        # print(f'\n Confirm py: {self.confirm_delete}\nprev version py {SightWordsApp.homescreen.self.confirm_delete}\n')
+
+        
         if self.ids.remove_player.text == 'Cancel':
-            self.ids.remove_player.text = 'Select Here'
-            SightWordsApp.homescreen.confirm_delete = False
+            self.confirm_delete = False
             return
-        if SightWordsApp.homescreen.confirm_delete == False:
+        elif self.ids.remove_player.text == 'Select Here':
+            self.confirm_delete = False
+            return            
+        if self.confirm_delete == False:
             self.delete_pop()
+            self.confirm_delete = True
         else:
             self.rem_player()
-            SightWordsApp.homescreen.confirm_delete = False 
+            return
+
+            # self.ids.remove_player.text = 'Select Here'
+
+        # if self.ids.remove_player.text == 'Select Here':
+        #     return
+        # if self.ids.remove_player.text == 'Cancel':
+        #     self.ids.remove_player.text = 'Select Here'
+        #     self.confirm_delete = False
+        #     return
+        # if self.confirm_delete == False:
+        #     self.delete_pop()
+        # else:
+        #     self.rem_player()
+        #     self.confirm_delete = False 
 
     def change_label(self):
 
         player = self.ids.choose_player.text
         self.parent.children[0].ids.plyr_banner.text = 'Hello '+player
-        self.ids.remove_player.text = 'Select Here'
+        if self.confirm_delete == False:
+            self.ids.remove_player.text = 'Select Here'
 
 
     def add_list_json(self):
@@ -190,6 +221,7 @@ class WordsScreen(Screen):
     completed_tup = ('chp1', 'chp2', 'chp3', 'chp4', 'chp5', 'chp6')
     plyr_banner =  StringProperty(player)
     homescreen = HomeScreen()
+    reading = False
     
 
     def __init__(self, **kwargs):
@@ -199,13 +231,24 @@ class WordsScreen(Screen):
         self.less_drop = LessonDropDown()
 
         self.rec = sr.Recognizer()
-        # self.rec.operation_timeout = 4
-        self.rec.pause_threshold = 0.5
-        self.rec.phrase_threshold = 0.3  #new
-        self.rec.non_speaking_duration = 0.5  #new
-
+        self.rec.pause_threshold = 0.5 #seconds of non-speaking audio before a phrase is considered complete
+        self.rec.phrase_threshold = 0.3  # minimum seconds of speaking audio before we consider the speaking audio a phrase - values below this are ignored (for filtering out clicks and pops)
+        self.rec.non_speaking_duration = 0.5  # seconds of non-speaking audio to keep on both sides of the recording
         self.mic = sr.Microphone()
-        self.mic.CHUNK = 768
+        self.mic.CHUNK = 768 # The microphone audio is recorded in chunks of ``chunk_size`` samples, at a rate of ``sample_rate`` samples per second (Hertz). If not specified, the value of ``sample_rate`` is determined automatically from the system's microphone settings.
+
+
+        try:
+            self.engine = pyttsx3.init()
+            self.voices = self.engine.getProperty('voices')
+            self.engine.setProperty('voice', self.voices[1].id) #changing index, changes voices. 1 for female 0 for male
+            self.volume = self.engine.getProperty('volume')
+            self.engine.setProperty('volume',1.0) # setting up volume level between 0 and 1
+            self.rate = self.engine.getProperty('rate')
+            self.engine.setProperty('rate', 100) # setting up new voice rate
+        except:
+            pass
+
 
         self.chap_drop.bind(on_select = lambda instance, x: setattr(self.ids.chapters, 'text', x))
 
@@ -239,7 +282,32 @@ class WordsScreen(Screen):
         self.cur_list = self.every_word[self.chapter][self.lesson:self.end_lesson]
 
         self.ids.preview.values = self.cur_list
-        Clock.schedule_once(self.word_label)
+        if self.reading ==  True:
+            Clock.schedule_once(self.word_label)
+
+    def call_read_list(self):
+        if self.ids.chapters.text == 'Chapters' and self.ids.lessons.text == 'Lessons':
+            return
+        Clock.schedule_interval(self.read_list, 2.3)
+        self.call_index = 0
+
+
+    def read_list(self, dt):
+        self.preview()
+        if self.call_index == 5:
+            self.ids.words.text = 'Get Ready!!!'
+            return False
+        self.ids.words.text = self.cur_list[self.call_index]
+        Clock.schedule_once(self.read_word, 0.3)
+
+    def read_word(self, dt):
+        try:
+            self.engine.say(self.ids.words.text)
+            self.engine.runAndWait()
+        except:
+            pass
+        self.call_index += 1
+
 
     
     def word_label(self, dt=0):
@@ -262,10 +330,14 @@ class WordsScreen(Screen):
             raise TypeError("`microphone` must be `Microphone` instance")
 
         with self.mic as source:
-            # self.rec.operation_timeout = 3
-            # self.rec.adjust_for_ambient_noise(source, duration = 0.5)
-            audio = self.rec.listen(source, phrase_time_limit=3.0)
+            self.rec.adjust_for_ambient_noise(source, duration=0.3)
+            audio = self.rec.listen(source, phrase_time_limit=4.0)
 
+            if self.rec.phrase_threshold >= 4:
+                ###   Popup   ###
+                Clock.schedule_once(self.preview)
+                return ''
+            
         self.spoken = {"success": True, "error": None, "transcription": None}
 
         try:
@@ -280,10 +352,12 @@ class WordsScreen(Screen):
             # speech was unintelligible
             self.spoken["error"] = "Urecognizeable speech"
             #############   POPUP   #################
+        finally:
+            self.spoken["error"] = ''
+
+
+
         print(f'\n\n{self.spoken["transcription"]}\n\n')
-        # stop_listening = r.listen_in_background(m, listen)
-        # stop_listening(wait_for_stop=False)
-        
         return self.spoken["transcription"]
 
 
@@ -305,7 +379,7 @@ class WordsScreen(Screen):
             if len(self.cur_lesson) == 0:
                 self.cur_lesson = self.cur_list
                 print(f'chooser...  {self.cur_lesson}')
-                print(len(self.cur_lesson))
+                # print(len(self.cur_lesson))
             
             # self.ids.words.text = random.choice(self.cur_lesson)
             # print(self.ids.words.text)
@@ -339,6 +413,7 @@ class WordsScreen(Screen):
             except:
                 self.cur_lesson.pop(self.cur_lesson.index(correct_word.capitalize()))
             print(f'checker...  {self.cur_lesson}')
+            self.ids.words.text = ''
 
 
             if len(self.cur_lesson) == 0:
@@ -352,11 +427,23 @@ class WordsScreen(Screen):
                 # Clock.schedule_once(self.happy_face, 0)
                 return
             else:
-                Clock.schedule_once(self.preview)
+                # self.ids.words.text = ''
+                Clock.schedule_once(self.between_word)
             #     Clock.schedule_once(self.word_label, 0)
             #     Clock.schedule_once(self.chooser, 0)
                 return
-        return
+        else:
+            # self.ids.words.text = ''
+            Clock.schedule_once(self.between_word)
+        #     Clock.schedule_once(self.word_label, 0)
+        #     Clock.schedule_once(self.chooser, 0)
+            return
+
+
+    def between_word(self, dt=0):
+        self.ids.words.text = ''
+        Clock.schedule_once(self.preview, 0.7)
+
 
     def completed_lesson(self, dt=0):
         """
@@ -368,17 +455,36 @@ class WordsScreen(Screen):
         player = self.ids.plyr_banner.text[6::]
 
         if self.ids.chapters.text != 'Chapters' and self.ids.lessons.text != 'Lessons':
+            # if add_lbl in comp_list[add_to_chap]:
+            #     print('comp less returned lesson already exists')
+            #     return
             if add_lbl in comp_list[add_to_chap]:
-                print('comp less returned lesson already exists')
+                Clock.schedule_once(self.happy_face)
                 return
-            comp_list[add_to_chap].append(add_lbl)
+            else:
+                comp_list[add_to_chap].append(add_lbl)
             new_list = sorted(comp_list[add_to_chap])
-            
+
             self.drop_chap = player+self.completed_tup[add_to_chap]
             if SightWordsApp.word_data.exists(self.drop_chap):
-                new_list.extend(SightWordsApp.word_data.get(self.drop_chap)['add_less'])
+                # new_list = sorted(comp_list[add_to_chap])
+                if new_list[-1] in SightWordsApp.word_data.get(self.drop_chap)['add_less']:
+                    print('already in there')
+                    Clock.schedule_once(self.happy_face)
+                    return
+                # next_list = set(new_list)
+                # new_list = list(next_list)
+                else:
+                    print('Adding')
+                    new_list.extend(SightWordsApp.word_data.get(self.drop_chap)['add_less'])
+            inter_set = set(new_list)
+            print(f'inter: {inter_set}')
+            final_list = list(inter_set)
+            print(f'\nfinal: {final_list}')
+                
+                # final_list - list(next_list)
             # print(f'comp lesson drop chap {self.drop_chap}')
-            SightWordsApp.word_data.put(self.drop_chap, add_less = sorted(new_list))
+            SightWordsApp.word_data.put(self.drop_chap, add_less = sorted(final_list))
             print('Completed Lesson Finished')
             self.happy_face()
             # print(f' PUT  {self.drop_chap} ...  {SightWordsApp.word_data}')
