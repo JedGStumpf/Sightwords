@@ -1,8 +1,8 @@
 """
-This is the file for the Sight Words App
+This is the main file for the app.
 """
-import sys
-import os
+import sys  #Used for Pyinstaller
+import os  #Used for pyinstaller
 import re
 import time
 import speech_recognition as sr
@@ -14,6 +14,7 @@ import sightlists as sl
 
 import kivy
 
+# the next 2 lines of code are for Desktop with Mouse apps.  To package for a touchscreen either delete or comment out.
 from kivy.config import Config
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 
@@ -37,7 +38,6 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.clock import Clock
 from kivy.animation import Animation
-# from functools import partial
 
 #Globals for use accross all classes
 comp_list = [[], [], [], [], [], []]
@@ -167,15 +167,12 @@ class HomeScreen(Screen):
             SightWordsApp.homescreen.confirm_delete = False 
 
     def change_label(self):
-
         player = self.ids.choose_player.text
         self.parent.children[0].ids.plyr_banner.text = 'Hello '+player
         self.ids.remove_player.text = 'Select Here'
 
-
     def add_list_json(self):
-        
-        SightWordsApp.word_data.put('all_players', users = self.player_list)
+         SightWordsApp.word_data.put('all_players', users = self.player_list)
 
 
 
@@ -198,12 +195,11 @@ class WordsScreen(Screen):
         self.chap_drop = ChapterDropDown()
         self.less_drop = LessonDropDown()
 
+        #These next 6 lines of code are for the SpeechRecognition app and can be found inthe source code for the Module.
         self.rec = sr.Recognizer()
-        # self.rec.operation_timeout = 4
         self.rec.pause_threshold = 0.5
-        self.rec.phrase_threshold = 0.3  #new
-        self.rec.non_speaking_duration = 0.5  #new
-
+        self.rec.phrase_threshold = 0.3  
+        self.rec.non_speaking_duration = 0.5  
         self.mic = sr.Microphone()
         self.mic.CHUNK = 768
 
@@ -262,28 +258,19 @@ class WordsScreen(Screen):
             raise TypeError("`microphone` must be `Microphone` instance")
 
         with self.mic as source:
-            # self.rec.operation_timeout = 3
-            # self.rec.adjust_for_ambient_noise(source, duration = 0.5)
             audio = self.rec.listen(source, phrase_time_limit=3.0)
-
         self.spoken = {"success": True, "error": None, "transcription": None}
 
         try:
             self.spoken["transcription"] = str(recognizer.recognize_google(audio, show_all=True))
-            # print(f'\n\nTry:  {str(self.spoken["transcription"].values()[0])}\n\n')
         except sr.RequestError:
             # API was unreachable or unresponsive
             self.spoken["success"] = False
             self.spoken["error"] = "API unavailable"
-            #############   POPUP   #################
         except sr.UnknownValueError:
             # speech was unintelligible
             self.spoken["error"] = "Urecognizeable speech"
-            #############   POPUP   #################
-        print(f'\n\n{self.spoken["transcription"]}\n\n')
-        # stop_listening = r.listen_in_background(m, listen)
-        # stop_listening(wait_for_stop=False)
-        
+       
         return self.spoken["transcription"]
 
 
@@ -291,70 +278,36 @@ class WordsScreen(Screen):
         """
         Simple method to create a copy of the cur_list to pop(correct word) from the list.
         """
-        # self.preview()
-        # self.word_label()
-        # self.preview()
         if self.ids.chapters.text != 'Chapters' and self.ids.lessons.text != 'Lessons':
-        
-            # pick = random.choice(range(self.cur_lesson))
-            # self.ids.words.text = self.cur_lesson[pick]
-            # print(self.cur_list)
-            # print(len(self.cur_lesson))
-
-            # if len(self.cur_lesson) == 0 or self.cur_lesson[0] not in self.cur_list:
             if len(self.cur_lesson) == 0:
                 self.cur_lesson = self.cur_list
-                print(f'chooser...  {self.cur_lesson}')
-                print(len(self.cur_lesson))
-            
-            # self.ids.words.text = random.choice(self.cur_lesson)
-            # print(self.ids.words.text)
+
             if self.ids.words.text == 'Get Ready!!!':
                 return
-            #else:
+
             Clock.schedule_once(self.checker)
 
-        
-        # self.checker()
 
-    
     def checker(self, dt=0):
         """
         Takes the text result from speach to text and checks if it matches the current sight word.  If there is a match the word will pop out of the current working list of words for the given lesson.  Once the list is empty the completed lesson method is called.
         """
-        # self.ids.words.text = random.choice(self.cur_lesson)
-        #Spoken will be text input from speach
-        # lesson_list = "'being', 'leave', 'family', 'it\'s', 'afternoon'"  #Replace with self.cur_list
-        # lesson_list = self.cur_lesson
-        # recognizer = sr.Recognizer()
-        # recognizer.operation_timeout = 3
-        # microphone = sr.Microphone()
-        # if re.search(self.ids.words.text, spoken, re.IGNORECASE):
-        # if re.search(self.ids.words.text, self.listen(recognizer, microphone), re.IGNORECASE):
+
         if re.search(self.ids.words.text, self.listen(self.rec, self.mic), re.IGNORECASE):
-        # if self.ids.words.text.lower() == self.listen(recognizer, microphone).lower():
             correct_word = self.ids.words.text.lower()
             try:
                 self.cur_lesson.pop(self.cur_lesson.index(correct_word))
             except:
                 self.cur_lesson.pop(self.cur_lesson.index(correct_word.capitalize()))
-            print(f'checker...  {self.cur_lesson}')
-
 
             if len(self.cur_lesson) == 0:
-            #     return 
-            # else:
-                # print('should add lesson')
+
                 self.ids.words.text = 'Great Job!!!\n Try Another Lesson'
                 Clock.schedule_once(self.completed_lesson)
-                # self.ids.words.text = 'Great Job!!!\n Try Another Lesson'
-                
-                # Clock.schedule_once(self.happy_face, 0)
                 return
+
             else:
                 Clock.schedule_once(self.preview)
-            #     Clock.schedule_once(self.word_label, 0)
-            #     Clock.schedule_once(self.chooser, 0)
                 return
         return
 
@@ -377,16 +330,10 @@ class WordsScreen(Screen):
             self.drop_chap = player+self.completed_tup[add_to_chap]
             if SightWordsApp.word_data.exists(self.drop_chap):
                 new_list.extend(SightWordsApp.word_data.get(self.drop_chap)['add_less'])
-            # print(f'comp lesson drop chap {self.drop_chap}')
+
             SightWordsApp.word_data.put(self.drop_chap, add_less = sorted(new_list))
             print('Completed Lesson Finished')
             self.happy_face()
-            # print(f' PUT  {self.drop_chap} ...  {SightWordsApp.word_data}')
-
-
-    def word_controller(self):
-        pass
-
 
     def happy_face(self, dt=0):
         """
@@ -402,14 +349,10 @@ class WordsScreen(Screen):
     def rem_happy(self, dt):
         while len(self.ids.words.children) > 0:
             self.ids.words.remove_widget(self.ids.words.children[0])
-            # self.ids.start.disabled = False
-            # self.chooser()
-            # Clock.schedule_once(self.chooser)
     
     def change_label(self):
         player = self.ids.plyr_banner.text[6::]
         self.parent.children[0].ids.plyr_banner2.text = 'Hello '+player
-
 
 
 class ResourceScreen(Screen):
@@ -417,7 +360,6 @@ class ResourceScreen(Screen):
     
     def __init__(self, *args, **kwargs):
         super(ResourceScreen, self).__init__(*args, **kwargs)
-        
     
     def open_wiki(self):
         webbrowser.open('https://en.wikipedia.org/wiki/Sight_word#Word_lists')
@@ -445,14 +387,11 @@ class ResourceScreen(Screen):
             player = self.ids.plyr_banner2.text[6::]
         else:
             player = ''
-        # print(f'is it the tup? {player+WordsScreen.completed_tup[index]}, what is index {index}')
-        # print(f' line 315 {player}')
+
         if SightWordsApp.word_data.exists(player+WordsScreen.completed_tup[index]):
-            # print('ah ha line 317')
             add_spin_vals = SightWordsApp.word_data.get(player+WordsScreen.completed_tup[index])['add_less']
             return add_spin_vals
-        # else:
-        #     print('oh no line 321')
+
         return ''
 
     def exitpop(self):
@@ -510,3 +449,5 @@ if __name__ == '__main__':
     for file in mei_files:
         resource_path(file)
     SightWordsApp().run()
+
+    
